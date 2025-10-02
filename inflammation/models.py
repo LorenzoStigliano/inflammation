@@ -33,6 +33,10 @@ def daily_min(data):
     return np.min(data, axis=0)
 
 def patient_normalise(data):
+    if not isinstance(data, np.ndarray):
+        raise TypeError("Incorrect data type")
+    if len(data.shape) != 2:
+            raise ValueError('inflammation array should be 2-dimensional')
     if np.any(data < 0):
         raise ValueError('Inflammation values should not be negative')
     """Normalise patient data from a 2D inflammation data array."""
