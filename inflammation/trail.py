@@ -1,6 +1,7 @@
 import numpy as np
 
 from inflammation.patient import Patient
+from inflammation.db import query_database, connect_to_database
 
 class Trial:
     def __init__(self, data, id):
@@ -9,11 +10,49 @@ class Trial:
 
     @classmethod
     def from_csv(cls, filename, id):
+        """
+        Class method to create a Trial instance from data in a CSV file.
+
+        Parameters:
+        filename (str): The file path of the CSV file to read.
+        id (str): The id to assign to the Trial instance.
+
+        Returns:
+        Trial: A Trial instance with the data and id from the CSV file.
+        """
         data = cls.load_csv(filename)
         return cls(data, id)
 
+    @classmethod
+    def from_database(cls, db_filepath, trial_id):
+        """
+        Class method to create a Trial instance from data in a SQLite database.
+
+        Parameters:
+        db_filepath (str): The file path of the SQLite database to connect to.
+        trial_id (str): The trial_id to query the database for.
+
+        Returns:
+        Trial: A Trial instance with the data and id from the database.
+        """
+        query = f'SELECT * FROM data WHERE trial_id = "{trial_id}"'
+        connection = connect_to_database(db_filepath)
+        data = query_database(query, connection)
+        if not data:
+            raise ValueError("No data found for trial_id")
+        # Convert the list of tuples to a numpy array and skip the first two columns
+        if np.shape(data)[0] == 1:  # If only one row is returned, convert to 2D array
+            data = np.array([data[0][3:]]).astype(float)
+        else:
+            data = np.array(data)[:, 3:].astype(float)
+        return cls(data, trial_id)
+
     @staticmethod
     def load_csv(filename):
+        """Load a Numpy array from a CSV
+
+        :param filename: Filename of CSV to load
+        """
         return np.loadtxt(fname=filename, delimiter=',')
 
     def get_patient(self, patient_id):
