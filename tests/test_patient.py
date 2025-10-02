@@ -1,10 +1,19 @@
 """Tests for the Patient model."""
+from inflammation.patient import Patient
 
+class TestPatient:
 
-def test_create_patient():
-    from inflammation.models import Patient
+    def setup_class(self):
+        self.p = Patient(id=1, data=[1,2,3])
 
-    name = 'Alice'
-    p = Patient(name=name)
+    def test_create_patient(self):
+        assert self.p.id == 1
 
-    assert p.name == name
+    def test_patient_daily_mean(self):
+        assert self.p.daily_mean() == 2
+
+    def test_patient_daily_max(self):
+        assert self.p.daily_max() == 3
+
+    def test_patient_daily_min(self):
+        assert self.p.daily_min() == 1

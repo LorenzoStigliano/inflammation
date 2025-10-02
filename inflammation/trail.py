@@ -1,20 +1,20 @@
 import numpy as np
 
-from patient import Patient
+from inflammation.patient import Patient
 
 class Trial:
-
-    def __init__(self, fname, id):
-        self.data = self.load_csv(fname)
+    def __init__(self, data, id):
+        self.data = data
         self.id = id
 
-    @staticmethod
-    def load_csv(fname):
-        """Load a Numpy array from a CSV
+    @classmethod
+    def from_csv(cls, filename, id):
+        data = cls.load_csv(filename)
+        return cls(data, id)
 
-        :param filename: Filename of CSV to load
-        """
-        return np.loadtxt(fname=fname, delimiter=',')
+    @staticmethod
+    def load_csv(filename):
+        return np.loadtxt(fname=filename, delimiter=',')
 
     def get_patient(self, patient_id):
         row = self.data[patient_id, :] # The first row of the 2D data array
